@@ -18,7 +18,7 @@ export default function Homepage() {
       .catch((error) => {
         console.error(error);
       });
-  });
+  }, []);
   return (
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack spacing={2}>

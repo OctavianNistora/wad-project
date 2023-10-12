@@ -31,9 +31,10 @@ export default function Register() {
         const user = userCredential.user;
         console.log(user);
         set(ref(database, `users/${user.uid}`), {
-          firstName,
-          lastName,
-          phoneNumber,
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+          accountType: "user",
         });
         navigate("/");
       })
@@ -115,7 +116,6 @@ export default function Register() {
               color="secondary"
               type="submit"
               fullWidth
-              sx={{ spacing: 2 }}
             >
               Create Account
             </Button>
@@ -127,7 +127,6 @@ export default function Register() {
                 navigate("/");
               }}
               fullWidth
-              sx={{ mt: 3, mb: 2 }}
             >
               Cancel
             </Button>
