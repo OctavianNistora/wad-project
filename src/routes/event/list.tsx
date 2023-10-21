@@ -14,11 +14,16 @@ import {
 } from "@mui/material";
 import { auth, database } from "../../firebase";
 import { get, ref } from "firebase/database";
-import { useState } from "react";
-import { useCounterState } from "../../states/useCounterState";
+import { useEffect, useState } from "react";
+//import { useCounterState } from "../../states/useCounterState";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as React from "react";
+
+const Tabs = [
+  { text: "Subscribed events", link: "/subscribed" },
+  { text: "View events list", link: "/event/list" },
+];
 
 export default function EventList() {
   //const { counter, fetchCounter } = useCounterState();
@@ -32,26 +37,27 @@ export default function EventList() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      get(ref(database, "users/" + auth.currentUser?.uid + "/firstName"))
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            setFirstName(snapshot.val());
-            console.log(firstName);
-          } else {
-            console.log("No data available");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else {
-      console.log("No user signed in");
-      navigate("/");
-    }
-  }); // marginLeft 150 somehow too much
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        get(ref(database, "users/" + auth.currentUser?.uid + "/firstName"))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              setFirstName(snapshot.val());
+              console.log(firstName);
+            } else {
+              console.log("No data available");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        console.log("No user signed in");
+        navigate("/");
+      }
+    });
+  }, []);
   return (
     <Container component="main" maxWidth={false} disableGutters>
       <Stack sx={{ marginLeft: 19 }}>
@@ -84,7 +90,6 @@ export default function EventList() {
             </Menu>
           </Box>
         </Stack>
-        <List></List>
         <Button variant="contained" onClick={() => navigate("/event/add")}>
           Add Event
         </Button>
@@ -102,13 +107,10 @@ export default function EventList() {
         anchor="left"
       >
         <List>
-          {[
-            { text: "Subscribed events", link: "/subscribed" },
-            { text: "View events list", link: "/event/list" },
-          ].map((text) => (
-            <ListItem key={text.text} disablePadding>
-              <ListItemButton onClick={() => navigate(text.link)}>
-                <ListItemText primary={text.text} />
+          {Tabs.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton onClick={() => navigate(item.link)}>
+                <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
           ))}

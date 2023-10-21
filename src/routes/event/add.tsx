@@ -4,18 +4,19 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
 import AutoComplete, { createFilterOptions } from "@mui/material/Autocomplete";
-import * as React from "react";
+import React, { useEffect } from "react";
 
 const filter = createFilterOptions<string>();
 
 export default function EventAdd() {
   const navigate = useNavigate();
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      console.log("No user signed in");
-      navigate(-1);
-    }
-  });
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/");
+      }
+    });
+  }, []);
   const [location, setLocation] = React.useState<string | null>(null);
   return (
     <Container component="main" maxWidth="xs" disableGutters>
@@ -52,11 +53,11 @@ export default function EventAdd() {
           onChange={(event, newValue) => {
             if (typeof newValue === "string") {
               setLocation(newValue);
-            } else if (newValue && newValue.inputValue) {
-              setLocation(newValue.inputValue);
-            } else {
-              setLocation(newValue);
-            }
+            } //else if (newValue && newValue.inputValue) {
+            //  setLocation(newValue.inputValue);
+            //} else {
+            //  setLocation(newValue);
+            //}
           }}
           filterOptions={(options, params) => {
             const filtered = filter(options, params);
@@ -92,7 +93,7 @@ export default function EventAdd() {
           variant="contained"
           color="secondary"
           onClick={() => {
-            navigate(-1);
+            navigate("/");
           }}
         >
           Cancel
