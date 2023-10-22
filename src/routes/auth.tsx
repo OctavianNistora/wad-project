@@ -2,8 +2,10 @@ import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { useCounterState } from "../states/useCounterState";
 
 export default function Auth() {
+  const { counter, fetchCounter } = useCounterState();
   const navigate = useNavigate();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,7 +18,7 @@ export default function Auth() {
       .then((userCredential: UserCredential) => {
         const user = userCredential.user;
         console.log(user);
-        navigate("/homepage");
+        navigate("/event/list");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -28,7 +30,7 @@ export default function Auth() {
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack alignItems="center" spacing={2}>
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
-          Event Planner
+          Authenticate
         </Typography>
         <Stack
           component="form"
@@ -69,6 +71,8 @@ export default function Auth() {
             >
               Sign Up
             </Button>
+            <Typography>Counter: {counter}</Typography>
+            <Button onClick={fetchCounter}>Quetz</Button>
           </Stack>
         </Stack>
       </Stack>

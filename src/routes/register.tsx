@@ -49,7 +49,7 @@ export default function Register() {
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack spacing={2}>
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
-          Event Planner
+          Register
         </Typography>
         <Stack
           component="form"
