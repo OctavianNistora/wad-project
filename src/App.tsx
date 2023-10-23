@@ -6,6 +6,7 @@ import Register from "./routes/register";
 import EventList from "./routes/event/list";
 import { CounterContextProvider } from "./states/counter.context";
 import EventAdd from "./routes/event/add";
+import EventDetails, { loader as eventLoader } from "./routes/event/details";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,11 @@ const router = createBrowserRouter([
   {
     path: "/event/add",
     element: <EventAdd />,
+  },
+  {
+    path: "/event/:eventId",
+    element: <EventDetails />,
+    loader: eventLoader,
   },
 ]);
 
