@@ -20,6 +20,8 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as React from "react";
+import { useAuthState } from "../../states/auth/authState";
+import { useEventState } from "../../states/events/eventsState";
 
 const Tabs = [
   {
@@ -35,56 +37,16 @@ const Tabs = [
   { text: "View accounts list", link: "/accounts/list", access: ["admin"] },
 ];
 
-type EventInfo = {
-  eventName: string;
-  eventStartDate: string;
-  eventEndDate: string;
-};
-
-type EventListProps = {
-  eventId: string;
-} & EventInfo;
-
 export default function EventList() {
-  //const { counter, fetchCounter } = useCounterState();
-  const [accountType, setAccountType] = useState<string>("");
-  const [events, setEvents] = useState<Record<string, EventInfo>>({});
   const navigate = useNavigate();
-  let eventList: EventListProps[] = [];
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        get(ref(database, "users/" + user.uid + "/accountType")).then(
-          (snapshot) => {
-            if (snapshot.exists()) {
-              setAccountType(snapshot.val());
-            } else {
-              console.log("No data available");
-            }
-          }
-        );
 
-        get(ref(database, "event-info")).then((snapshot) => {
-          if (snapshot.exists()) {
-            setEvents(snapshot.val());
-            eventList = [];
-            Object.keys(snapshot.val()).forEach((key) => {
-              eventList.push({
-                eventId: key,
-                ...snapshot.val()[key],
-              });
-            });
-            eventList.sort(compare);
-            console.log(eventList);
-          } else {
-            console.log("No data available");
-          }
-        });
-      } else {
-        console.log("No user signed in");
-        navigate("/");
-      }
-    });
+  const { userEvents, getUserEvents } = useEventState();
+
+  // const [events, setEvents] = useState<Record<string, EventInfo>>({});
+  // let eventList: EventListProps[] = [];
+
+  useEffect(() => {
+    getUserEvents();
   }, []);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -130,20 +92,20 @@ export default function EventList() {
         <Divider />
         <Stack>
           <List>
-            {Object.keys(events).map((key) => (
+            {/* {Object.keys(events).map((key) => (
               <ListItem key={key} disablePadding>
                 <ListItemButton onClick={() => navigate("/event/" + key)}>
                   <ListItemText primary={events[key].eventName} />
                 </ListItemButton>
               </ListItem>
-            ))}
+            ))} */}
           </List>
         </Stack>
-        {(accountType === "admin" || accountType === "organizer") && (
+        {/* {(accountType === "admin" || accountType === "organizer") && (
           <Button variant="contained" onClick={() => navigate("/event/add")}>
             Add Event
           </Button>
-        )}
+        )} */}
       </Stack>
       <Drawer
         sx={{
@@ -157,7 +119,7 @@ export default function EventList() {
         variant="permanent"
         anchor="left"
       >
-        <List>
+        {/* <List>
           {Tabs.map(
             (item) =>
               item.access.includes(accountType) && (
@@ -168,18 +130,8 @@ export default function EventList() {
                 </ListItem>
               )
           )}
-        </List>
+        </List> */}
       </Drawer>
     </Container>
   );
-}
-
-function compare(a: EventListProps, b: EventListProps) {
-  if (a.eventStartDate < b.eventStartDate) {
-    return -1;
-  }
-  if (a.eventStartDate > b.eventStartDate) {
-    return 1;
-  }
-  return 0;
 }

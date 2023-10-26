@@ -1,9 +1,12 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { AuthContextProvider } from "./states/auth/auth.context.tsx";
+import { EventsContextProvider } from "./states/events/events.context.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <AuthContextProvider>
-    <App />
+    <EventsContextProvider>
+      <App />
+    </EventsContextProvider>
   </AuthContextProvider>
 );

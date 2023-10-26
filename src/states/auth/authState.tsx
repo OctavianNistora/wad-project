@@ -1,11 +1,11 @@
 import { useCallback, useContext, useMemo } from "react";
-import { AuthContext } from "./auth.context";
+import { AuthContext, UserAccountTypeEnum } from "./auth.context";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, database } from "../../firebase";
-import { ref, set } from "@firebase/database";
+import { ref, get, set } from "@firebase/database";
 
 export type LoginRequest = {
   email: string;
@@ -34,6 +34,13 @@ export const useAuthState = () => {
     setRegisterErrorMessage,
   } = useContext(AuthContext);
 
+  const handleGetUserAccountType = useCallback(async (userId: string) => {
+    const userAccountTypeResponse = await get(
+      ref(database, "users/" + userId + "/accountType")
+    );
+    return userAccountTypeResponse.val();
+  }, []);
+
   const handleLogin = useCallback(async (request: LoginRequest) => {
     setIsLoginLoading(true);
     setLoginErrorMessage("");
@@ -44,7 +51,13 @@ export const useAuthState = () => {
         email,
         password
       );
-      setUser(loginResponse.user);
+      const userAccountTypeResponse = await handleGetUserAccountType(
+        loginResponse.user.uid
+      );
+      setUser({
+        ...loginResponse.user,
+        accountType: userAccountTypeResponse.val() as UserAccountTypeEnum,
+      });
     } catch (e) {
       console.error("login e: ", e);
       setLoginErrorMessage("Wrong credentials");
@@ -63,7 +76,13 @@ export const useAuthState = () => {
         email,
         password
       );
-      setUser(createUserResponse.user);
+      const userAccountTypeResponse = await handleGetUserAccountType(
+        createUserResponse.user.uid
+      );
+      setUser({
+        ...userAccountTypeResponse.user,
+        accountType: userAccountTypeResponse.val() as UserAccountTypeEnum,
+      });
       if (createUserResponse) {
         set(ref(database, `users/${createUserResponse.user.uid}`), {
           firstName: firstName,

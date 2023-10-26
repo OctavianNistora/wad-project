@@ -1,5 +1,15 @@
-import { User } from "@firebase/auth";
+import { User as FirebaseUser} from "@firebase/auth";
 import { createContext, useState, PropsWithChildren, useMemo } from "react";
+
+export enum UserAccountTypeEnum {
+  Admin ="admin",
+  Organizer = 'organizer',
+  User = 'user'
+}
+
+export type User = FirebaseUser & {
+  accountType: UserAccountTypeEnum
+}
 
 type AuthState = {
   user: User | null;
