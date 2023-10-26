@@ -1,4 +1,3 @@
-// WIP
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,7 @@ import { auth, database } from "../../firebase";
 import AutoComplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import React, { useEffect } from "react";
 import { push, ref, set, update } from "firebase/database";
+import { addEvent } from "../../firebaseFunctions";
 
 const filter = createFilterOptions<string>();
 
@@ -18,45 +18,21 @@ export default function EventAdd() {
       }
     });
   }, []);
-  const [location, setLocation] = React.useState<string | null>(null);
-  const [category, setCategory] = React.useState<string | null>(null);
+  const [location, setLocation] = React.useState("");
+  const [category, setCategory] = React.useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const eventName = data.get("eventName") as string;
-    const eventDescription = data.get("eventDescription") as string;
-    const eventStartDate = data.get("eventStartDate") as string;
-    const eventEndDate = data.get("eventEndDate") as string;
-    const eventLocation = data.get("eventLocation") as string;
-    const eventCategory = data.get("eventCategory") as string;
-    const newEventKey = push(ref(database, "events")).key;
-    if (newEventKey === null) {
-      return;
-    }
-    const eventNameData = {
-      [newEventKey]: eventName,
+    const eventData = {
+      eventName: data.get("eventName") as string,
+      eventDescription: data.get("eventDescription") as string,
+      eventStartDate: data.get("eventStartDate") as string,
+      eventEndDate: data.get("eventEndDate") as string,
+      eventLocation: location,
+      eventCategory: category,
     };
-    const eventDetailsData = {
-      eventDescription: eventDescription,
-      eventOrganizer: auth.currentUser?.uid,
-      eventStartDate: eventStartDate,
-      eventEndDate: eventEndDate,
-      eventLocation: eventLocation,
-      eventCategory: eventCategory,
-    };
-    const categoryData = {
-      [newEventKey]: true,
-    };
-    const locationData = {
-      [newEventKey]: true,
-    };
-    set(ref(database, "event-details/" + newEventKey), eventDetailsData);
-    update(ref(database, "event-names"), eventNameData);
-    update(ref(database, "locations/" + eventLocation), locationData);
-    if (eventCategory !== null && eventCategory !== "") {
-      update(ref(database, "categories/" + eventCategory), categoryData);
-    }
+    addEvent(eventData);
     navigate("/event/list");
   };
 
@@ -168,6 +144,7 @@ export default function EventAdd() {
               label="Event Category"
               variant="outlined"
               name="eventCategory"
+              required
             />
           )}
         />

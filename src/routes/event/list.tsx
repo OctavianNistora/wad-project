@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { auth, database } from "../../firebase";
-import { get, ref, set } from "firebase/database";
+import { get, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 //import { useCounterState } from "../../states/useCounterState";
 import { onAuthStateChanged } from "firebase/auth";
@@ -35,11 +35,22 @@ const Tabs = [
   { text: "View accounts list", link: "/accounts/list", access: ["admin"] },
 ];
 
+type EventInfo = {
+  eventName: string;
+  eventStartDate: string;
+  eventEndDate: string;
+};
+
+type EventListProps = {
+  eventId: string;
+} & EventInfo;
+
 export default function EventList() {
   //const { counter, fetchCounter } = useCounterState();
   const [accountType, setAccountType] = useState<string>("");
-  const [events, setEvents] = useState<Record<string, string>>({});
+  const [events, setEvents] = useState<Record<string, EventInfo>>({});
   const navigate = useNavigate();
+  let eventList: EventListProps[] = [];
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -53,9 +64,18 @@ export default function EventList() {
           }
         );
 
-        get(ref(database, "event-names")).then((snapshot) => {
+        get(ref(database, "event-info")).then((snapshot) => {
           if (snapshot.exists()) {
             setEvents(snapshot.val());
+            eventList = [];
+            Object.keys(snapshot.val()).forEach((key) => {
+              eventList.push({
+                eventId: key,
+                ...snapshot.val()[key],
+              });
+            });
+            eventList.sort(compare);
+            console.log(eventList);
           } else {
             console.log("No data available");
           }
@@ -113,7 +133,7 @@ export default function EventList() {
             {Object.keys(events).map((key) => (
               <ListItem key={key} disablePadding>
                 <ListItemButton onClick={() => navigate("/event/" + key)}>
-                  <ListItemText primary={events[key]} />
+                  <ListItemText primary={events[key].eventName} />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -154,14 +174,12 @@ export default function EventList() {
   );
 }
 
-/*
-<Stack spacing={2}>
-        <Stack alignItems="center" spacing={2}>
-          <Typography variant="h5" align="center" gutterBottom>
-            Welcome {firstName}!
-          </Typography>
-        </Stack>
-      </Stack>
-      <Typography>Counter: {counter}</Typography>
-      <Button onClick={fetchCounter}>Quetz</Button>
-      */
+function compare(a: EventListProps, b: EventListProps) {
+  if (a.eventStartDate < b.eventStartDate) {
+    return -1;
+  }
+  if (a.eventStartDate > b.eventStartDate) {
+    return 1;
+  }
+  return 0;
+}
