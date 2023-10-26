@@ -1,56 +1,50 @@
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, database } from "../firebase";
-import { ref, set } from "firebase/database";
 import { useNavigate } from "react-router-dom";
+import { RegisterRequest, useAuthState } from "../states/auth/authState";
+import { useEffect } from "react";
 
 export default function Register() {
+  const navigate = useNavigate();
+
+  const { user, handleRegister, isRegisterLoading, registerErrorMessage } =
+    useAuthState();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get("email") as string;
-    const password = data.get("password") as string;
-    const confirmPassword = data.get("confirmPassword") as string;
-    const firstName = data.get("firstName") as string;
-    const lastName = data.get("lastName") as string;
-    const phoneNumber = data.get("phoneNumber") as string;
-    console.log(
-      email,
-      password,
-      confirmPassword,
-      firstName,
-      lastName,
-      phoneNumber
-    );
-    if (password !== confirmPassword) {
+    const registerRequest: RegisterRequest = {
+      email: event.currentTarget.email.value,
+      password: event.currentTarget.password.value,
+      firstName: event.currentTarget.firstName.value,
+      lastName: event.currentTarget.lastName.value,
+      phoneNumber: event.currentTarget.phoneNumber.value,
+    };
+    // TODO: use hook forms for this.
+    if (
+      registerRequest.password !== event.currentTarget.confirmPassword.value
+    ) {
       alert("Passwords do not match");
       return;
     }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        set(ref(database, `users/${user.uid}`), {
-          firstName: firstName,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
-          accountType: "user",
-        });
-        navigate("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+    handleRegister(registerRequest);
   };
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
+
   return (
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack spacing={2}>
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
           Register
         </Typography>
+        {registerErrorMessage && (
+          <Typography variant="h4" color="error">
+            {registerErrorMessage}
+          </Typography>
+        )}
         <Stack
           component="form"
           onSubmit={handleSubmit}
@@ -64,6 +58,7 @@ export default function Register() {
             fullWidth
             autoComplete="given-name"
             id="firstName"
+            disabled={isRegisterLoading}
             name="firstName"
           />
           <TextField
@@ -73,6 +68,7 @@ export default function Register() {
             fullWidth
             autoComplete="family-name"
             id="lastName"
+            disabled={isRegisterLoading}
             name="lastName"
           />
           <TextField
@@ -82,6 +78,7 @@ export default function Register() {
             fullWidth
             type="email"
             id="email"
+            disabled={isRegisterLoading}
             name="email"
           />
           <TextField
@@ -91,6 +88,7 @@ export default function Register() {
             fullWidth
             type="password"
             id="password"
+            disabled={isRegisterLoading}
             name="password"
           />
           <TextField
@@ -100,6 +98,7 @@ export default function Register() {
             fullWidth
             type="password"
             id="confirmPassword"
+            disabled={isRegisterLoading}
             name="confirmPassword"
           />
           <TextField
@@ -109,6 +108,7 @@ export default function Register() {
             type="tel"
             id="phoneNumber"
             name="phoneNumber"
+            disabled={isRegisterLoading}
           />
           <Stack direction="row" spacing={2}>
             <Button
@@ -116,6 +116,7 @@ export default function Register() {
               color="secondary"
               type="submit"
               fullWidth
+              disabled={isRegisterLoading}
             >
               Create Account
             </Button>
@@ -124,11 +125,12 @@ export default function Register() {
               color="primary"
               type="button"
               onClick={() => {
-                navigate("/");
+                navigate("/login");
               }}
               fullWidth
+              disabled={isRegisterLoading}
             >
-              Cancel
+              Login
             </Button>
           </Stack>
         </Stack>

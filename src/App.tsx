@@ -1,45 +1,55 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { darkTheme } from "./theme";
-import Auth from "./routes/auth";
+import Login from "./routes/login";
 import Register from "./routes/register";
 import EventList from "./routes/event/list";
-import { CounterContextProvider } from "./states/counter.context";
 import EventAdd from "./routes/event/add";
 import EventDetails, { loader as eventLoader } from "./routes/event/details";
+import AuthWrapper from "./components/AuthWrapper";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Auth />,
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "/register",
     element: <Register />,
   },
   {
-    path: "/event/list",
-    element: <EventList />,
+    path: "/",
+    element: (
+      <AuthWrapper>
+        <EventList />
+      </AuthWrapper>
+    ),
   },
   {
     path: "/event/add",
-    element: <EventAdd />,
+    element: (
+      <AuthWrapper>
+        <EventAdd />
+      </AuthWrapper>
+    ),
   },
   {
     path: "/event/:eventId",
-    element: <EventDetails />,
+    element: (
+      <AuthWrapper>
+        <EventDetails />
+      </AuthWrapper>
+    ),
     loader: eventLoader,
   },
 ]);
 
 function App() {
   return (
-    <CounterContextProvider>
-      <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </CounterContextProvider>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <RouterProvider router={router} />
+    </ThemeProvider>
   );
 }
 

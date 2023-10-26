@@ -1,37 +1,39 @@
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
-import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { useCounterState } from "../states/useCounterState";
+import { LoginRequest, useAuthState } from "../states/auth/authState";
+import { useEffect } from "react";
+import PageWrapper from "../components/PageWrapper";
 
-export default function Auth() {
-  const { counter, fetchCounter } = useCounterState();
+export default function Login() {
   const navigate = useNavigate();
+
+  const { user, handleLogin, isLoginLoading, loginErrorMessage} = useAuthState();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    signInWithEmailAndPassword(
-      auth,
-      data.get("email") as string,
-      data.get("password") as string
-    )
-      .then((userCredential: UserCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        navigate("/event/list");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
+    const loginRequest: LoginRequest = {
+      email: event.currentTarget.email.value,
+      password: event.currentTarget.password.value,
+    };
+    handleLogin(loginRequest);
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/event/list");
+    }
+  }, [user]);
+
   return (
+    <PageWrapper>
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack alignItems="center" spacing={2}>
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
           Authenticate
         </Typography>
+        {loginErrorMessage && <Typography variant="h4" color="error">
+          {loginErrorMessage}
+        </Typography>}
         <Stack
           component="form"
           onSubmit={handleSubmit}
@@ -58,24 +60,29 @@ export default function Auth() {
             name="password"
           />
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={isLoginLoading}
+            >
               Log In
             </Button>
             <Button
               variant="contained"
               color="secondary"
               type="button"
+              disabled={isLoginLoading}
               onClick={() => {
                 navigate("/register");
               }}
             >
               Sign Up
             </Button>
-            <Typography>Counter: {counter}</Typography>
-            <Button onClick={fetchCounter}>Quetz</Button>
           </Stack>
         </Stack>
       </Stack>
     </Container>
+    </PageWrapper>
   );
 }
