@@ -17,11 +17,11 @@ export type RegisterRequest = {
 };
 
 export const useEventState = () => {
-  const { userEvents, setUserEvents, userEventsLoading, setUserEventsLoading } =
+  const { allEvents, setAllEvents, allEventsLoading, setAllEventsLoading } =
     useContext(EventsContext);
 
-  const getUserEvents = useCallback(async () => {
-    setUserEventsLoading(true);
+  const getAllEvents = useCallback(async () => {
+    setAllEventsLoading(true);
     try {
       get(ref(database, "event-info")).then((snapshot) => {
         if (snapshot.exists()) {
@@ -34,7 +34,7 @@ export const useEventState = () => {
             });
           });
           newEventsList.sort(compare);
-          setUserEvents(newEventsList)
+          setAllEvents(newEventsList)
         } else {
           console.log("No data available");
         }
@@ -42,17 +42,17 @@ export const useEventState = () => {
     } catch (error) {
       console.error("error: ", error);
     } finally {
-      setUserEventsLoading(false);
+      setAllEventsLoading(false);
     }
   }, []);
 
   const data = useMemo(() => {
     return {
-      userEvents,
-      userEventsLoading,
-      getUserEvents,
+      allEvents,
+      allEventsLoading,
+      getAllEvents,
     };
-  }, [userEvents, userEventsLoading, getUserEvents]);
+  }, [allEvents, allEventsLoading, getAllEvents]);
 
   return data;
 };

@@ -1,7 +1,44 @@
-import { Button, Container, Stack, TextField, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { RegisterRequest, useAuthState } from "../states/auth/authState";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
+import { RegisterRequest, useAuthState } from "../states/auth/authState";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  firstName: yup.string().required("First Name is required"),
+  lastName: yup.string().required("Last Name is required"),
+  email: yup.string().email().required("Email is required"),
+  phoneNumber: yup.string(),
+  password: yup
+    .string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special case character"
+    ),
+  confirmPassword: yup
+    .string()
+    .required("Confirm Password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+});
+
+type FormType = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export default function Register() {
   const navigate = useNavigate();
@@ -9,22 +46,23 @@ export default function Register() {
   const { user, handleRegister, isRegisterLoading, registerErrorMessage } =
     useAuthState();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const { control, handleSubmit } = useForm<FormType>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+    },
+    // @ts-ignore
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data: FormType) => {
     const registerRequest: RegisterRequest = {
-      email: event.currentTarget.email.value,
-      password: event.currentTarget.password.value,
-      firstName: event.currentTarget.firstName.value,
-      lastName: event.currentTarget.lastName.value,
-      phoneNumber: event.currentTarget.phoneNumber.value,
+      ...data,
     };
-    // TODO: use hook forms for this.
-    if (
-      registerRequest.password !== event.currentTarget.confirmPassword.value
-    ) {
-      alert("Passwords do not match");
-      return;
-    }
     handleRegister(registerRequest);
   };
 
@@ -40,81 +78,123 @@ export default function Register() {
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
           Register
         </Typography>
-        {registerErrorMessage && (
-          <Typography variant="h4" color="error">
-            {registerErrorMessage}
-          </Typography>
-        )}
-        <Stack
-          component="form"
-          onSubmit={handleSubmit}
-          alignItems="center"
-          spacing={2}
-        >
-          <TextField
-            margin="normal"
-            label="First Name"
-            required
-            fullWidth
-            autoComplete="given-name"
-            id="firstName"
-            disabled={isRegisterLoading}
+
+        <Stack spacing={2}>
+          <Controller
+            control={control}
             name="firstName"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="First Name"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Last Name"
-            required
-            fullWidth
-            autoComplete="family-name"
-            id="lastName"
-            disabled={isRegisterLoading}
+          <Controller
+            control={control}
             name="lastName"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Last Name"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Email"
-            required
-            fullWidth
-            type="email"
-            id="email"
-            disabled={isRegisterLoading}
+          <Controller
+            control={control}
             name="email"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Email"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Password"
-            required
-            fullWidth
-            type="password"
-            id="password"
-            disabled={isRegisterLoading}
+          <Controller
+            control={control}
             name="password"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Password"
+                  required
+                  fullWidth
+                  type="password"
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Confirm Password"
-            required
-            fullWidth
-            type="password"
-            id="confirmPassword"
-            disabled={isRegisterLoading}
+          <Controller
+            control={control}
             name="confirmPassword"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Confirm Password"
+                  required
+                  fullWidth
+                  type="password"
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Phone Number"
-            fullWidth
-            type="tel"
-            id="phoneNumber"
+          <Controller
+            control={control}
             name="phoneNumber"
-            disabled={isRegisterLoading}
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Phone Number"
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <Stack direction="row" spacing={2}>
+         
+          <Stack direction="row" spacing={2} width="100%">
             <Button
               variant="contained"
               color="secondary"
-              type="submit"
+              onClick={() => handleSubmit(onSubmit)()}
               fullWidth
               disabled={isRegisterLoading}
             >
@@ -133,6 +213,11 @@ export default function Register() {
               Login
             </Button>
           </Stack>
+          {registerErrorMessage && (
+            <Typography variant="h4" color="error">
+              {registerErrorMessage}
+            </Typography>
+          )}
         </Stack>
       </Stack>
     </Container>

@@ -8,34 +8,34 @@ export type EventInfo = {
 };
 
 type EventsState = {
-  userEvents: EventInfo[];
-  setUserEvents: React.Dispatch<React.SetStateAction<EventInfo[]>>;
-  userEventsLoading: boolean;
-  setUserEventsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  allEvents: EventInfo[];
+  setAllEvents: React.Dispatch<React.SetStateAction<EventInfo[]>>;
+  allEventsLoading: boolean;
+  setAllEventsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const EventsContext = createContext<EventsState>({
-  userEvents: [],
-  setUserEvents: () => null,
-  userEventsLoading: false,
-  setUserEventsLoading: () => null,
+  allEvents: [],
+  setAllEvents: () => null,
+  allEventsLoading: false,
+  setAllEventsLoading: () => null,
 });
 
 export const EventsContextProvider = (
   props: PropsWithChildren<Record<never, any>>
 ) => {
   const { children } = props;
-  const [userEvents, setUserEvents] = useState<EventInfo[]>([]);
-  const [userEventsLoading, setUserEventsLoading] = useState(false);
+  const [allEvents, setAllEvents] = useState<EventInfo[]>([]);
+  const [allEventsLoading, setAllEventsLoading] = useState(false);
 
   const authValue = useMemo(() => {
     return {
-      userEvents,
-      setUserEvents,
-      userEventsLoading,
-      setUserEventsLoading,
+      allEvents,
+      setAllEvents,
+      allEventsLoading,
+      setAllEventsLoading,
     };
-  }, [userEvents, setUserEvents, userEventsLoading, setUserEventsLoading]);
+  }, [allEvents, setAllEvents, allEventsLoading, setAllEventsLoading]);
   return (
     <EventsContext.Provider value={authValue}>
       {children}

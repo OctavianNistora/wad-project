@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuthState } from "../states/auth/authState";
 
@@ -10,9 +10,11 @@ export default function AuthWrapper(
   const navigate = useNavigate();
   const { user } = useAuthState();
 
-  if (!user) {
-    navigate("/auth");
-  }
+  useEffect(()=>{
+    if(!user) navigate("/login");
+  },[user])
+
+  if (!user) return null
 
   return children;
 }

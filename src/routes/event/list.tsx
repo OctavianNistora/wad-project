@@ -23,115 +23,41 @@ import * as React from "react";
 import { useAuthState } from "../../states/auth/authState";
 import { useEventState } from "../../states/events/eventsState";
 
-const Tabs = [
-  {
-    text: "Subscribed events",
-    link: "/subscribed",
-    access: ["user", "organizer", "admin"],
-  },
-  {
-    text: "View events list",
-    link: "/event/list",
-    access: ["user", "organizer", "admin"],
-  },
-  { text: "View accounts list", link: "/accounts/list", access: ["admin"] },
-];
-
 export default function EventList() {
   const navigate = useNavigate();
 
-  const { userEvents, getUserEvents } = useEventState();
-
-  // const [events, setEvents] = useState<Record<string, EventInfo>>({});
-  // let eventList: EventListProps[] = [];
+  const { allEvents, getAllEvents } = useEventState();
+  console.log('allEvents: ', allEvents);
+  const { user } = useAuthState();
 
   useEffect(() => {
-    getUserEvents();
+    getAllEvents();
   }, []);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
+  if (!user?.accountType) return null;
 
   return (
     <Container component="main" maxWidth={false} disableGutters>
       <Stack sx={{ marginLeft: 19 }}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Box />
-          <Typography
-            noWrap
-            variant="h2"
-            align="center"
-            gutterBottom
-            color={"cyan"}
-          >
-            Events List
-          </Typography>
-          <Box>
-            <Button onClick={handleClick} size="large">
-              Account
-            </Button>
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-              <Stack>
-                <MenuItem onClick={() => navigate("/profile")}>
-                  Edit Profile
-                </MenuItem>
-                <MenuItem onClick={() => auth.signOut()}>Logout</MenuItem>
-              </Stack>
-            </Menu>
-          </Box>
-        </Stack>
-        <Divider />
         <Stack>
           <List>
-            {/* {Object.keys(events).map((key) => (
-              <ListItem key={key} disablePadding>
-                <ListItemButton onClick={() => navigate("/event/" + key)}>
-                  <ListItemText primary={events[key].eventName} />
+            {allEvents.map((event) => (
+              <ListItem key={event.eventId} disablePadding>
+                <ListItemButton
+                  onClick={() => navigate("/event/" + event.eventId)}
+                >
+                  <ListItemText primary={event.eventName} />
                 </ListItemButton>
               </ListItem>
-            ))} */}
+            ))}
           </List>
         </Stack>
-        {/* {(accountType === "admin" || accountType === "organizer") && (
+        {(user.accountType === "admin" || user.accountType === "organizer") && (
           <Button variant="contained" onClick={() => navigate("/event/add")}>
             Add Event
           </Button>
-        )} */}
+        )}
       </Stack>
-      <Drawer
-        sx={{
-          width: 150,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: 150,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="permanent"
-        anchor="left"
-      >
-        {/* <List>
-          {Tabs.map(
-            (item) =>
-              item.access.includes(accountType) && (
-                <ListItem key={item.text} disablePadding>
-                  <ListItemButton onClick={() => navigate(item.link)}>
-                    <ListItemText primary={item.text} />
-                  </ListItemButton>
-                </ListItem>
-              )
-          )}
-        </List> */}
-      </Drawer>
     </Container>
   );
 }

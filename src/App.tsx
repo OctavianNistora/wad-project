@@ -7,6 +7,8 @@ import EventList from "./routes/event/list";
 import EventAdd from "./routes/event/add";
 import EventDetails, { loader as eventLoader } from "./routes/event/details";
 import AuthWrapper from "./components/AuthWrapper";
+import PageWrapper from "./components/PageWrapper";
+import './root.css'
 
 const router = createBrowserRouter([
   {
@@ -21,7 +23,9 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <AuthWrapper>
-        <EventList />
+        <PageWrapper>
+          <EventList />
+        </PageWrapper>
       </AuthWrapper>
     ),
   },
@@ -29,7 +33,9 @@ const router = createBrowserRouter([
     path: "/event/add",
     element: (
       <AuthWrapper>
-        <EventAdd />
+        <PageWrapper>
+          <EventAdd />
+        </PageWrapper>
       </AuthWrapper>
     ),
   },
@@ -37,7 +43,9 @@ const router = createBrowserRouter([
     path: "/event/:eventId",
     element: (
       <AuthWrapper>
-        <EventDetails />
+        <PageWrapper>
+          <EventDetails />
+        </PageWrapper>
       </AuthWrapper>
     ),
     loader: eventLoader,

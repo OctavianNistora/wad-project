@@ -1,11 +1,18 @@
 import { useCallback, useContext, useMemo } from "react";
-import { AuthContext, UserAccountTypeEnum } from "./auth.context";
+import { AuthContext } from "./auth.context";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, database } from "../../firebase";
-import { ref, get, set } from "@firebase/database";
+import { ref, set } from "@firebase/database";
+
+const mapFirebaseErrorToMessage= (errorMessage: string) => {
+  if(errorMessage.includes("auth/email-already-in-use")){
+    return "Email is already in use"
+  }
+  return ""
+}
 
 export type LoginRequest = {
   email: string;
@@ -23,7 +30,6 @@ export type RegisterRequest = {
 export const useAuthState = () => {
   const {
     user,
-    setUser,
     isLoginLoading,
     setIsLoginLoading,
     loginErrorMessage,
@@ -34,30 +40,16 @@ export const useAuthState = () => {
     setRegisterErrorMessage,
   } = useContext(AuthContext);
 
-  const handleGetUserAccountType = useCallback(async (userId: string) => {
-    const userAccountTypeResponse = await get(
-      ref(database, "users/" + userId + "/accountType")
-    );
-    return userAccountTypeResponse.val();
-  }, []);
-
   const handleLogin = useCallback(async (request: LoginRequest) => {
     setIsLoginLoading(true);
     setLoginErrorMessage("");
     const { email, password } = request;
     try {
-      const loginResponse = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
-      const userAccountTypeResponse = await handleGetUserAccountType(
-        loginResponse.user.uid
-      );
-      setUser({
-        ...loginResponse.user,
-        accountType: userAccountTypeResponse.val() as UserAccountTypeEnum,
-      });
     } catch (e) {
       console.error("login e: ", e);
       setLoginErrorMessage("Wrong credentials");
@@ -76,13 +68,6 @@ export const useAuthState = () => {
         email,
         password
       );
-      const userAccountTypeResponse = await handleGetUserAccountType(
-        createUserResponse.user.uid
-      );
-      setUser({
-        ...userAccountTypeResponse.user,
-        accountType: userAccountTypeResponse.val() as UserAccountTypeEnum,
-      });
       if (createUserResponse) {
         set(ref(database, `users/${createUserResponse.user.uid}`), {
           firstName: firstName,
@@ -91,9 +76,10 @@ export const useAuthState = () => {
           accountType: "user",
         });
       }
-    } catch (e) {
-      console.error("register e: ", e);
-      setRegisterErrorMessage("Something went wrong! ");
+    } catch (error: any) {
+      const authErrorMessage = error.message
+      console.error("register error: ", error);
+      setRegisterErrorMessage(mapFirebaseErrorToMessage(authErrorMessage));
     } finally {
       setIsRegisterLoading(false);
     }
