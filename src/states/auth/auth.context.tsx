@@ -1,8 +1,4 @@
-import {
-  User as FirebaseUser,
-  Unsubscribe,
-  onAuthStateChanged,
-} from "@firebase/auth";
+import { User as FirebaseUser, onAuthStateChanged } from "@firebase/auth";
 import {
   createContext,
   useState,
@@ -55,8 +51,7 @@ export const AuthContextProvider = (
 ) => {
   const { children } = props;
   const [user, setUser] = useState<User | null>(null);
-  const [initialized, setInitialized] =
-    useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState("");
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
@@ -68,11 +63,11 @@ export const AuthContextProvider = (
         handleGetUserAccountType(user);
       } else {
         setUser(null);
-       setInitialized(true)
+        setInitialized(true);
       }
     });
-    
-    return unsubscribe
+
+    return unsubscribe;
   }, []);
 
   const handleGetUserAccountType = useCallback(async (user: FirebaseUser) => {
@@ -83,7 +78,7 @@ export const AuthContextProvider = (
       ...user,
       accountType: userAccountTypeResponse.val() as UserAccountTypeEnum,
     });
-    setInitialized(true)
+    setInitialized(true);
   }, []);
 
   const authValue = useMemo(() => {
@@ -113,6 +108,8 @@ export const AuthContextProvider = (
   ]);
 
   return (
-    <AuthContext.Provider value={authValue}>{initialized ? children : null}</AuthContext.Provider>
+    <AuthContext.Provider value={authValue}>
+      {initialized ? children : null}
+    </AuthContext.Provider>
   );
 };

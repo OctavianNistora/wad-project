@@ -3,19 +3,6 @@ import { database } from "../../firebase";
 import { ref, get } from "@firebase/database";
 import { EventInfo, EventsContext } from "./events.context";
 
-export type LoginRequest = {
-  email: string;
-  password: string;
-};
-
-export type RegisterRequest = {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-};
-
 export const useEventState = () => {
   const { allEvents, setAllEvents, allEventsLoading, setAllEventsLoading } =
     useContext(EventsContext);
@@ -34,7 +21,7 @@ export const useEventState = () => {
             });
           });
           newEventsList.sort(compare);
-          setAllEvents(newEventsList)
+          setAllEvents(newEventsList);
         } else {
           console.log("No data available");
         }

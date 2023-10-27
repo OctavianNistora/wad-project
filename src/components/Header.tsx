@@ -17,9 +17,9 @@ import { DRAWER_WIDTH } from "./SideNav";
 export default function Header() {
   const navigate = useNavigate();
   const { user } = useAuthState();
-  const [ref, setRef] = useRefCallback()
+  const [ref, setRef] = useRefCallback();
 
-  const [rightWidth, setRightWidth] = useState(0)
+  const [rightWidth, setRightWidth] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -30,9 +30,9 @@ export default function Header() {
     setAnchorEl(null);
   };
 
-  useEffect(()=>{
-    if(ref?.current?.clientWidth) setRightWidth(ref?.current?.clientWidth)
-  },[ref])
+  useEffect(() => {
+    if (ref?.current?.clientWidth) setRightWidth(ref?.current?.clientWidth);
+  }, [ref]);
 
   if (!user) {
     return null;

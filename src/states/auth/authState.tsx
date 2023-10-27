@@ -7,12 +7,12 @@ import {
 import { auth, database } from "../../firebase";
 import { ref, set } from "@firebase/database";
 
-const mapFirebaseErrorToMessage= (errorMessage: string) => {
-  if(errorMessage.includes("auth/email-already-in-use")){
-    return "Email is already in use"
+const mapFirebaseErrorToMessage = (errorMessage: string) => {
+  if (errorMessage.includes("auth/email-already-in-use")) {
+    return "Email is already in use";
   }
-  return ""
-}
+  return "";
+};
 
 export type LoginRequest = {
   email: string;
@@ -45,13 +45,9 @@ export const useAuthState = () => {
     setLoginErrorMessage("");
     const { email, password } = request;
     try {
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (e) {
-      console.error("login e: ", e);
+      console.error("login error: ", e);
       setLoginErrorMessage("Wrong credentials");
     } finally {
       setIsLoginLoading(false);
@@ -77,7 +73,7 @@ export const useAuthState = () => {
         });
       }
     } catch (error: any) {
-      const authErrorMessage = error.message
+      const authErrorMessage = error.message;
       console.error("register error: ", error);
       setRegisterErrorMessage(mapFirebaseErrorToMessage(authErrorMessage));
     } finally {

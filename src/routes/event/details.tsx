@@ -1,12 +1,8 @@
-import { useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { database, auth } from "../../firebase";
 import { get, ref } from "firebase/database";
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-
-export async function loader({ params }) {
-  return params.eventId;
-}
 
 type EventDetailsProps = {
   eventCategory: string;
@@ -23,21 +19,20 @@ type EventMetadataProps = {
 
 export default function EventDetails() {
   // HOOKS #1
-  const {eventId} = useParams();
+  const { eventId } = useParams();
   const navigate = useNavigate();
 
   // CUSTOM HOOKS #2
   // useAuthState
 
-
   // useState #3
-  console.log('eventId: ', eventId);
+  console.log("eventId: ", eventId);
   const [eventDetails, setEventDetails] = useState<EventDetailsProps>();
-  console.log('eventDetails: ', eventDetails);
+  console.log("eventDetails: ", eventDetails);
   const [eventMetadata, setEventMetadata] = useState<EventMetadataProps>({
     eventName: "",
   });
-  console.log('eventMetadata: ', eventMetadata);
+  console.log("eventMetadata: ", eventMetadata);
 
   // functions #4
   // whatever
@@ -102,7 +97,7 @@ export default function EventDetails() {
             variant="contained"
             color="primary"
             onClick={() => {
-              navigate("/event/list");
+              navigate("/");
             }}
           >
             Cancel

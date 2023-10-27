@@ -1,25 +1,14 @@
 import {
-  Box,
   Button,
   Container,
-  Divider,
-  Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Stack,
-  Typography,
 } from "@mui/material";
-import { auth, database } from "../../firebase";
-import { get, ref } from "firebase/database";
-import { useEffect, useState } from "react";
-//import { useCounterState } from "../../states/useCounterState";
-import { onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import * as React from "react";
 import { useAuthState } from "../../states/auth/authState";
 import { useEventState } from "../../states/events/eventsState";
 
@@ -27,7 +16,7 @@ export default function EventList() {
   const navigate = useNavigate();
 
   const { allEvents, getAllEvents } = useEventState();
-  console.log('allEvents: ', allEvents);
+  console.log("allEvents: ", allEvents);
   const { user } = useAuthState();
 
   useEffect(() => {

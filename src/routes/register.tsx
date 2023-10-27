@@ -1,13 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Container,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { RegisterRequest, useAuthState } from "../states/auth/authState";
@@ -189,7 +182,7 @@ export default function Register() {
               );
             }}
           />
-         
+
           <Stack direction="row" spacing={2} width="100%">
             <Button
               variant="contained"

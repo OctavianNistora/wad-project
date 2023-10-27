@@ -1,5 +1,20 @@
-import { push, ref, set, update } from "firebase/database";
+import { push, ref, update } from "firebase/database";
 import { auth, database } from "./firebase";
+
+type EventInfoDataType = {
+  eventName: string;
+  eventStartDate: string;
+  eventEndDate: string;
+};
+
+type EventDetailsDataType = {
+  eventName: string;
+  eventDescription: string;
+  eventStartDate: string;
+  eventEndDate: string;
+  eventLocation: string;
+  eventCategory: string;
+};
 
 type EventData = {
   eventName: string;
@@ -29,14 +44,32 @@ export function addEvent(eventData: EventData) {
     eventLocation: eventData.eventLocation,
     eventCategory: eventData.eventCategory,
   };
-  const categoryData = {
-    [newEventKey]: true,
-  };
   const locationData = {
+    [eventData.eventLocation]: true,
+  };
+  const locationEventData = {
     [newEventKey]: true,
   };
-  set(ref(database, `event-details/${newEventKey}`), eventDetailsData);
-  set(ref(database, `event-info/${newEventKey}`), eventInfoData);
-  update(ref(database, `locations/${eventData.eventLocation}`), locationData);
-  update(ref(database, `categories/${eventData.eventCategory}`), categoryData);
+  const categoryData = {
+    [eventData.eventCategory]: true,
+  };
+  const categoryEventData = {
+    [newEventKey]: true,
+  };
+
+  const setEventData: Record<string, EventInfoDataType | EventDetailsDataType> =
+    {};
+  setEventData[`event-info/${newEventKey}`] = eventInfoData;
+  setEventData[`event-details/${newEventKey}`] = eventDetailsData;
+  update(ref(database), setEventData);
+  update(ref(database, `location-names`), locationData);
+  update(
+    ref(database, `location-events/${eventData.eventLocation}`),
+    locationEventData
+  );
+  update(ref(database, `category-names`), categoryData);
+  update(
+    ref(database, `category-events/${eventData.eventCategory}`),
+    categoryEventData
+  );
 }

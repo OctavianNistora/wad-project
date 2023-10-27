@@ -5,10 +5,10 @@ import Login from "./routes/login";
 import Register from "./routes/register";
 import EventList from "./routes/event/list";
 import EventAdd from "./routes/event/add";
-import EventDetails, { loader as eventLoader } from "./routes/event/details";
+import EventDetails from "./routes/event/details";
 import AuthWrapper from "./components/AuthWrapper";
 import PageWrapper from "./components/PageWrapper";
-import './root.css'
+import "./root.css";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +48,6 @@ const router = createBrowserRouter([
         </PageWrapper>
       </AuthWrapper>
     ),
-    loader: eventLoader,
   },
 ]);
 

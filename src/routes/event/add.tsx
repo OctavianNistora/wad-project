@@ -2,12 +2,14 @@ import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, database } from "../../firebase";
-import AutoComplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import AutoComplete from "@mui/material/Autocomplete";
 import React, { useEffect } from "react";
-import { push, ref, set, update } from "firebase/database";
 import { addEvent } from "../../firebaseFunctions";
+import { get, ref } from "firebase/database";
 
-const filter = createFilterOptions<string>();
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers-pro";
 
 export default function EventAdd() {
   const navigate = useNavigate();
@@ -18,8 +20,10 @@ export default function EventAdd() {
       }
     });
   }, []);
-  const [location, setLocation] = React.useState("");
-  const [category, setCategory] = React.useState("");
+  const [locationOptions, setLocationOptions] = React.useState<string[]>([]);
+  const [categoryOptions, setCategoryOptions] = React.useState<string[]>([]);
+  const [eventStartDate, setEventStartDate] = React.useState<Date | null>(null);
+  const [eventEndDate, setEventEndDate] = React.useState<Date | null>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,14 +31,43 @@ export default function EventAdd() {
     const eventData = {
       eventName: data.get("eventName") as string,
       eventDescription: data.get("eventDescription") as string,
-      eventStartDate: data.get("eventStartDate") as string,
-      eventEndDate: data.get("eventEndDate") as string,
-      eventLocation: location,
-      eventCategory: category,
+      eventStartDate: eventStartDate?.toISOString().split("T")[0] as string,
+      eventEndDate: eventEndDate?.toISOString().split("T")[0] as string,
+      eventLocation: data.get("eventLocation") as string,
+      eventCategory: data.get("eventCategory") as string,
     };
     addEvent(eventData);
-    navigate("/event/list");
+    navigate("/");
   };
+
+  useEffect(() => {
+    get(ref(database, "location-names")).then((snapshot) => {
+      if (snapshot.exists()) {
+        const locationsResponseData = snapshot.val();
+        const newLocationOptions: string[] = [];
+        Object.keys(locationsResponseData).forEach((key) => {
+          newLocationOptions.push(key);
+        });
+        setLocationOptions(newLocationOptions);
+      } else {
+        setLocationOptions([]);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    get(ref(database, "category-names")).then((snapshot) => {
+      if (snapshot.exists()) {
+        const categoriesResponseData = snapshot.val();
+        const newCategoryOptions: string[] = [];
+        Object.keys(categoriesResponseData).forEach((key) => {
+          newCategoryOptions.push(key);
+        });
+        setCategoryOptions(newCategoryOptions);
+      } else {
+        setCategoryOptions([]);
+      }
+    });
+  }, []);
 
   return (
     <Container component="main" maxWidth="xs" disableGutters>
@@ -58,49 +91,33 @@ export default function EventAdd() {
           required
           autoComplete="off"
         />
-        <TextField
-          id="eventStartDate"
-          label="Event Date"
-          variant="outlined"
-          name="eventStartDate"
-          required
-          autoComplete="off"
-        />
-        <TextField
-          id="eventEndDate"
-          label="Event End Date"
-          variant="outlined"
-          name="eventEndDate"
-          required
-          autoComplete="off"
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Stack direction="row" spacing={2} justifyContent="center">
+            <DatePicker
+              label="Event Start Date"
+              format="DD/MM/YYYY"
+              views={["year", "month", "day"]}
+              openTo="day"
+              value={eventStartDate}
+              onChange={(newValue) => {
+                setEventStartDate(newValue);
+              }}
+            />
+            <DatePicker
+              label="Event End Date"
+              format="DD/MM/YYYY"
+              views={["year", "month", "day"]}
+              openTo="day"
+              value={eventEndDate}
+              onChange={(newValue) => {
+                setEventEndDate(newValue);
+              }}
+            />
+          </Stack>
+        </LocalizationProvider>
         <AutoComplete
-          value={location}
-          onChange={(_event, newValue) => {
-            if (typeof newValue === "string") {
-              setLocation(newValue);
-            } //else if (newValue && newValue.inputValue) {
-            //  setLocation(newValue.inputValue);
-            //} else {
-            //  setLocation(newValue);
-            //}
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-            const { inputValue } = params;
-            const isExisting = options.some((option) => inputValue === option);
-            if (inputValue !== "" && !isExisting) {
-              filtered.push(inputValue);
-            }
-
-            return filtered;
-          }}
-          options={[]}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          renderOption={(props, option) => <li {...props}>{option}</li>}
           freeSolo
+          options={locationOptions}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -112,32 +129,8 @@ export default function EventAdd() {
           )}
         />
         <AutoComplete
-          value={category}
-          onChange={(_event, newValue) => {
-            if (typeof newValue === "string") {
-              setCategory(newValue);
-            } //else if (newValue && newValue.inputValue) {
-            //  setCategory(newValue.inputValue);
-            //} else {
-            //  setCategory(newValue);
-            //}
-          }}
-          filterOptions={(options, params) => {
-            const filtered = filter(options, params);
-            const { inputValue } = params;
-            const isExisting = options.some((option) => inputValue === option);
-            if (inputValue !== "" && !isExisting) {
-              filtered.push(inputValue);
-            }
-
-            return filtered;
-          }}
-          options={[]}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          renderOption={(props, option) => <li {...props}>{option}</li>}
           freeSolo
+          options={categoryOptions}
           renderInput={(params) => (
             <TextField
               {...params}
