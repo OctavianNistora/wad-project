@@ -28,7 +28,7 @@ export const EventsContextProvider = (
   const [allEvents, setAllEvents] = useState<EventInfo[]>([]);
   const [allEventsLoading, setAllEventsLoading] = useState(false);
 
-  const authValue = useMemo(() => {
+  const eventValue = useMemo(() => {
     return {
       allEvents,
       setAllEvents,
@@ -37,7 +37,7 @@ export const EventsContextProvider = (
     };
   }, [allEvents, setAllEvents, allEventsLoading, setAllEventsLoading]);
   return (
-    <EventsContext.Provider value={authValue}>
+    <EventsContext.Provider value={eventValue}>
       {children}
     </EventsContext.Provider>
   );

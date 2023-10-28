@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   Container,
   List,
@@ -6,6 +7,7 @@ import {
   ListItemButton,
   ListItemText,
   Stack,
+  TextField,
 } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,18 +18,45 @@ export default function EventList() {
   const navigate = useNavigate();
 
   const { allEvents, getAllEvents } = useEventState();
-  console.log("allEvents: ", allEvents);
   const { user } = useAuthState();
+
+  if (!user?.accountType) return null;
 
   useEffect(() => {
     getAllEvents();
   }, []);
-
-  if (!user?.accountType) return null;
-
   return (
     <Container component="main" maxWidth={false} disableGutters>
       <Stack sx={{ marginLeft: 19 }}>
+        <Stack direction="row" spacing={2}>
+          <TextField label="Search name" fullWidth />
+          <Autocomplete
+            options={[]}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Event Location"
+                variant="outlined"
+                name="eventLocation"
+                required
+              />
+            )}
+          />
+          <Autocomplete
+            options={[]}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Event Category"
+                variant="outlined"
+                name="eventCategory"
+                required
+              />
+            )}
+          />
+        </Stack>
         <Stack>
           <List>
             {allEvents.map((event) => (
