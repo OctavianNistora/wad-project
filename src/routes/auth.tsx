@@ -2,10 +2,8 @@ import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { useCounterState } from "../states/useCounterState";
 
 export default function Auth() {
-  const { counter, fetchCounter } = useCounterState();
   const navigate = useNavigate();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -71,8 +69,6 @@ export default function Auth() {
             >
               Sign Up
             </Button>
-            <Typography>Counter: {counter}</Typography>
-            <Button onClick={fetchCounter}>Quetz</Button>
           </Stack>
         </Stack>
       </Stack>

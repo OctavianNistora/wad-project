@@ -1,121 +1,195 @@
-import { Button, Container, Stack, TextField, Typography } from "@mui/material";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, database } from "../firebase";
-import { ref, set } from "firebase/database";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button, Container, Stack, TextField, Typography } from "@mui/material";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
+import { RegisterRequest, useAuthState } from "../states/auth/authState";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  firstName: yup.string().required("First Name is required"),
+  lastName: yup.string().required("Last Name is required"),
+  email: yup.string().email().required("Email is required"),
+  phoneNumber: yup.string(),
+  password: yup
+    .string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special case character"
+    ),
+  confirmPassword: yup
+    .string()
+    .required("Confirm Password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+});
+
+type FormType = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+};
 
 export default function Register() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get("email") as string;
-    const password = data.get("password") as string;
-    const confirmPassword = data.get("confirmPassword") as string;
-    const firstName = data.get("firstName") as string;
-    const lastName = data.get("lastName") as string;
-    const phoneNumber = data.get("phoneNumber") as string;
-    console.log(
-      email,
-      password,
-      confirmPassword,
-      firstName,
-      lastName,
-      phoneNumber
-    );
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        set(ref(database, `users/${user.uid}`), {
-          firstName: firstName,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
-          accountType: "user",
-        });
-        navigate("/");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      });
-  };
   const navigate = useNavigate();
+
+  const { user, handleRegister, isRegisterLoading, registerErrorMessage } =
+    useAuthState();
+
+  const { control, handleSubmit } = useForm<FormType>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+    },
+    // @ts-ignore
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data: FormType) => {
+    const registerRequest: RegisterRequest = {
+      ...data,
+    };
+    handleRegister(registerRequest);
+  };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
+
   return (
     <Container component="main" maxWidth="xs" disableGutters>
       <Stack spacing={2}>
         <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
           Register
         </Typography>
-        <Stack
-          component="form"
-          onSubmit={handleSubmit}
-          alignItems="center"
-          spacing={2}
-        >
-          <TextField
-            margin="normal"
-            label="First Name"
-            required
-            fullWidth
-            autoComplete="given-name"
-            id="firstName"
+
+        <Stack spacing={2}>
+          <Controller
+            control={control}
             name="firstName"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="First Name"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Last Name"
-            required
-            fullWidth
-            autoComplete="family-name"
-            id="lastName"
+          <Controller
+            control={control}
             name="lastName"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Last Name"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Email"
-            required
-            fullWidth
-            type="email"
-            id="email"
+          <Controller
+            control={control}
             name="email"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Email"
+                  required
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Password"
-            required
-            fullWidth
-            type="password"
-            id="password"
+          <Controller
+            control={control}
             name="password"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Password"
+                  required
+                  fullWidth
+                  type="password"
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Confirm Password"
-            required
-            fullWidth
-            type="password"
-            id="confirmPassword"
+          <Controller
+            control={control}
             name="confirmPassword"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Confirm Password"
+                  required
+                  fullWidth
+                  type="password"
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <TextField
-            margin="normal"
-            label="Phone Number"
-            fullWidth
-            type="tel"
-            id="phoneNumber"
+          <Controller
+            control={control}
             name="phoneNumber"
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Phone Number"
+                  fullWidth
+                  error={Boolean(error)}
+                  helperText={error?.message}
+                  disabled={isRegisterLoading}
+                />
+              );
+            }}
           />
-          <Stack direction="row" spacing={2}>
+
+          <Stack direction="row" spacing={2} width="100%">
             <Button
               variant="contained"
               color="secondary"
-              type="submit"
+              onClick={() => handleSubmit(onSubmit)()}
               fullWidth
+              disabled={isRegisterLoading}
             >
               Create Account
             </Button>
@@ -124,13 +198,19 @@ export default function Register() {
               color="primary"
               type="button"
               onClick={() => {
-                navigate("/");
+                navigate("/login");
               }}
               fullWidth
+              disabled={isRegisterLoading}
             >
-              Cancel
+              Login
             </Button>
           </Stack>
+          {registerErrorMessage && (
+            <Typography variant="h4" color="error">
+              {registerErrorMessage}
+            </Typography>
+          )}
         </Stack>
       </Stack>
     </Container>
