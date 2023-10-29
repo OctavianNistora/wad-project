@@ -100,7 +100,7 @@ export default function EventDetails() {
               navigate("/");
             }}
           >
-            Cancel
+            Go Back
           </Button>
         </Stack>
       </Stack>

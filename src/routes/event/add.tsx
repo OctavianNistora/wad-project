@@ -1,15 +1,22 @@
-import { Button, Container, Stack, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, database } from "../../firebase";
-import AutoComplete from "@mui/material/Autocomplete";
+import { auth } from "../../firebase";
 import React, { useEffect } from "react";
 import { addEvent } from "../../firebaseFunctions";
-import { get, ref } from "firebase/database";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers-pro";
+import { useCategoriesState } from "../../states/categories/categoriesState";
+import { useLocationsState } from "../../states/locations/locationsState";
 
 export default function EventAdd() {
   const navigate = useNavigate();
@@ -20,10 +27,11 @@ export default function EventAdd() {
       }
     });
   }, []);
-  const [locationOptions, setLocationOptions] = React.useState<string[]>([]);
-  const [categoryOptions, setCategoryOptions] = React.useState<string[]>([]);
   const [eventStartDate, setEventStartDate] = React.useState<Date | null>(null);
   const [eventEndDate, setEventEndDate] = React.useState<Date | null>(null);
+
+  const [allCategories, getAllCategories] = useCategoriesState();
+  const [allLocations, getAllLocations] = useLocationsState();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,34 +49,9 @@ export default function EventAdd() {
   };
 
   useEffect(() => {
-    get(ref(database, "location-names")).then((snapshot) => {
-      if (snapshot.exists()) {
-        const locationsResponseData = snapshot.val();
-        const newLocationOptions: string[] = [];
-        Object.keys(locationsResponseData).forEach((key) => {
-          newLocationOptions.push(key);
-        });
-        setLocationOptions(newLocationOptions);
-      } else {
-        setLocationOptions([]);
-      }
-    });
+    getAllLocations();
+    getAllCategories();
   }, []);
-  useEffect(() => {
-    get(ref(database, "category-names")).then((snapshot) => {
-      if (snapshot.exists()) {
-        const categoriesResponseData = snapshot.val();
-        const newCategoryOptions: string[] = [];
-        Object.keys(categoriesResponseData).forEach((key) => {
-          newCategoryOptions.push(key);
-        });
-        setCategoryOptions(newCategoryOptions);
-      } else {
-        setCategoryOptions([]);
-      }
-    });
-  }, []);
-
   return (
     <Container component="main" maxWidth="xs" disableGutters>
       <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
@@ -115,9 +98,9 @@ export default function EventAdd() {
             />
           </Stack>
         </LocalizationProvider>
-        <AutoComplete
+        <Autocomplete
           freeSolo
-          options={locationOptions}
+          options={allLocations}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -128,9 +111,9 @@ export default function EventAdd() {
             />
           )}
         />
-        <AutoComplete
+        <Autocomplete
           freeSolo
-          options={categoryOptions}
+          options={allCategories}
           renderInput={(params) => (
             <TextField
               {...params}
