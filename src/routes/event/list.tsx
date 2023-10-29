@@ -20,11 +20,12 @@ export default function EventList() {
   const { allEvents, getAllEvents } = useEventState();
   const { user } = useAuthState();
 
-  if (!user?.accountType) return null;
-
   useEffect(() => {
     getAllEvents();
   }, []);
+
+  if (!user?.accountType) return null;
+
   return (
     <Container component="main" maxWidth={false} disableGutters>
       <Stack sx={{ marginLeft: 19 }}>

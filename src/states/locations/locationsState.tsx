@@ -14,20 +14,19 @@ export const useLocationsState = () => {
   const getAllLocations = useCallback(async () => {
     setAllLocationsLoading(true);
     try {
-      get(ref(database, "location-names")).then((snapshot) => {
-        if (snapshot.exists()) {
-          const locationsResponseData = snapshot.val();
-          const newLocationsList: string[] = [];
-          Object.keys(locationsResponseData).forEach((key) => {
-            if (locationsResponseData[key]) {
-              newLocationsList.push(key);
-            }
-          });
-          setAllLocations(newLocationsList);
-        } else {
-          console.log("No data available");
-        }
-      });
+      const snapshot = await get(ref(database, "location-names"));
+      if (snapshot.exists()) {
+        const locationsResponseData = snapshot.val();
+        const newLocationsList: string[] = [];
+        Object.keys(locationsResponseData).forEach((key) => {
+          if (locationsResponseData[key]) {
+            newLocationsList.push(key);
+          }
+        });
+        setAllLocations(newLocationsList);
+      } else {
+        console.log("No data available");
+      }
     } catch (error) {
       console.error("error: ", error);
     } finally {

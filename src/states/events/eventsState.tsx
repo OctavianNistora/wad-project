@@ -10,22 +10,21 @@ export const useEventState = () => {
   const getAllEvents = useCallback(async () => {
     setAllEventsLoading(true);
     try {
-      get(ref(database, "event-info")).then((snapshot) => {
-        if (snapshot.exists()) {
-          const eventsInfoResponseData = snapshot.val();
-          const newEventsList: EventInfo[] = [];
-          Object.keys(eventsInfoResponseData).forEach((key) => {
-            newEventsList.push({
-              eventId: key,
-              ...eventsInfoResponseData[key],
-            });
+      const snapshot = await get(ref(database, "event-info"));
+      if (snapshot.exists()) {
+        const eventsInfoResponseData = snapshot.val();
+        const newEventsList: EventInfo[] = [];
+        Object.keys(eventsInfoResponseData).forEach((key) => {
+          newEventsList.push({
+            eventId: key,
+            ...eventsInfoResponseData[key],
           });
-          newEventsList.sort(compare);
-          setAllEvents(newEventsList);
-        } else {
-          console.log("No data available");
-        }
-      });
+        });
+        newEventsList.sort(compare);
+        setAllEvents(newEventsList);
+      } else {
+        console.log("No data available");
+      }
     } catch (error) {
       console.error("error: ", error);
     } finally {

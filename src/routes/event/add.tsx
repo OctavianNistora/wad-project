@@ -50,8 +50,6 @@ export default function EventAdd() {
 
   useEffect(() => {
     getAllLocations();
-  }, []);
-  useEffect(() => {
     getAllCategories();
   }, []);
   return (

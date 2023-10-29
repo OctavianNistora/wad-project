@@ -14,20 +14,19 @@ export const useCategoriesState = () => {
   const getAllCategories = useCallback(async () => {
     setAllCategoriesLoading(true);
     try {
-      get(ref(database, "category-names")).then((snapshot) => {
-        if (snapshot.exists()) {
-          const categoriesResponseData = snapshot.val();
-          const newCategoriesList: string[] = [];
-          Object.keys(categoriesResponseData).forEach((key) => {
-            if (categoriesResponseData[key]) {
-              newCategoriesList.push(key);
-            }
-          });
-          setAllCategories(newCategoriesList);
-        } else {
-          console.log("No data available");
-        }
-      });
+      const snapshot = await get(ref(database, "category-names"));
+      if (snapshot.exists()) {
+        const categoriesResponseData = snapshot.val();
+        const newCategoriesList: string[] = [];
+        Object.keys(categoriesResponseData).forEach((key) => {
+          if (categoriesResponseData[key]) {
+            newCategoriesList.push(key);
+          }
+        });
+        setAllCategories(newCategoriesList);
+      } else {
+        console.log("No data available");
+      }
     } catch (error) {
       console.error("error: ", error);
     } finally {
