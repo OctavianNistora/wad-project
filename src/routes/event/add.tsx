@@ -30,8 +30,8 @@ export default function EventAdd() {
   const [eventStartDate, setEventStartDate] = React.useState<Date | null>(null);
   const [eventEndDate, setEventEndDate] = React.useState<Date | null>(null);
 
-  const [allCategories, getAllCategories] = useCategoriesState();
-  const [allLocations, getAllLocations] = useLocationsState();
+  const { allCategories, getAllCategories } = useCategoriesState();
+  const { allLocations, getAllLocations } = useLocationsState();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -132,7 +132,7 @@ export default function EventAdd() {
             variant="contained"
             color="secondary"
             onClick={() => {
-              navigate("/event/list");
+              navigate("/");
             }}
           >
             Cancel

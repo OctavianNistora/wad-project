@@ -61,9 +61,6 @@ export default function EventDetails() {
 
   return (
     <Container component="main" maxWidth="xs" disableGutters>
-      <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
-        Event Details
-      </Typography>
       <Stack component="form" spacing={2}>
         <TextField label="Event name" defaultValue={eventMetadata.eventName} />
         <TextField
@@ -86,22 +83,31 @@ export default function EventDetails() {
           label="Event category"
           defaultValue={eventDetails?.eventCategory}
         />
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} width="100%">
           {auth.currentUser &&
             auth.currentUser.uid === eventDetails?.eventOrganizer && (
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" fullWidth>
                 Edit
               </Button>
             )}
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
+            fullWidth
             onClick={() => {
               navigate("/");
             }}
           >
             Go Back
           </Button>
+        </Stack>
+        <Stack direction="row" spacing={2} width="48%">
+          {auth.currentUser &&
+            auth.currentUser.uid === eventDetails?.eventOrganizer && (
+              <Button variant="contained" color="error" fullWidth>
+                Delete
+              </Button>
+            )}
         </Stack>
       </Stack>
     </Container>
