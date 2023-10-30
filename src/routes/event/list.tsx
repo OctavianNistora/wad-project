@@ -17,15 +17,16 @@ import { useCategoriesState } from "../../states/categories/categoriesState";
 import { useLocationsState } from "../../states/locations/locationsState";
 import { database } from "../../firebase";
 import { get, ref } from "firebase/database";
+import PermissionWrapper from "../../components/PermissionWrapper";
 
 export default function EventList() {
   const navigate = useNavigate();
   const [searchName, setSearchName] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocationEvents, setSelectedLocationEvents] = useState<
     string[]
   >([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCategoryEvents, setSelectedCategoryEvents] = useState<
     string[]
   >([]);
@@ -95,7 +96,10 @@ export default function EventList() {
           <Autocomplete
             options={allLocations}
             fullWidth
-            onChange={(event, value) => setSelectedLocation(value)}
+            onChange={(event, value) =>
+              (value && setSelectedLocation(value)) ||
+              (!value && setSelectedLocation(""))
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -109,7 +113,10 @@ export default function EventList() {
           <Autocomplete
             options={allCategories}
             fullWidth
-            onChange={(event, value) => setSelectedCategory(value)}
+            onChange={(event, value) =>
+              (value && setSelectedCategory(value)) ||
+              (!value && setSelectedCategory(""))
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -147,11 +154,11 @@ export default function EventList() {
               ))}
           </List>
         </Stack>
-        {(user.accountType === "admin" || user.accountType === "organizer") && (
+        <PermissionWrapper roleRequired="organizer">
           <Button variant="contained" onClick={() => navigate("/event/add")}>
             Add Event
           </Button>
-        )}
+        </PermissionWrapper>
       </Stack>
     </Container>
   );

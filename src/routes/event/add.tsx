@@ -4,7 +4,6 @@ import {
   Container,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -54,10 +53,7 @@ export default function EventAdd() {
   }, []);
   return (
     <Container component="main" maxWidth="xs" disableGutters>
-      <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
-        Add Event
-      </Typography>
-      <Stack component={"form"} spacing={2} onSubmit={handleSubmit}>
+      <Stack component="form" spacing={2} onSubmit={handleSubmit}>
         <TextField
           id="eventName"
           label="Event Name"

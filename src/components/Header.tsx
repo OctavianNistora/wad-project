@@ -49,7 +49,7 @@ export default function Header() {
       >
         <Box width={`${rightWidth}px`} />
         <Typography noWrap variant="h2" align="center" color="cyan">
-          Events List
+          Event Planner
         </Typography>
         <Box ref={setRef}>
           <Box

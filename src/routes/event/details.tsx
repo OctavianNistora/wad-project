@@ -1,8 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { database, auth } from "../../firebase";
+import { database } from "../../firebase";
 import { get, ref } from "firebase/database";
-import { Button, Container, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, Stack, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import PermissionWrapper from "../../components/PermissionWrapper";
 
 type EventDetailsProps = {
   eventCategory: string;
@@ -83,32 +84,42 @@ export default function EventDetails() {
           label="Event category"
           defaultValue={eventDetails?.eventCategory}
         />
-        <Stack direction="row" spacing={2} width="100%">
-          {auth.currentUser &&
-            auth.currentUser.uid === eventDetails?.eventOrganizer && (
-              <Button variant="contained" color="primary" fullWidth>
-                Edit
+        <Box>
+          <Grid container spacing={2}>
+            <PermissionWrapper
+              roleRequired="admin"
+              ownerId={eventDetails?.eventOrganizer}
+            >
+              <Grid item xs={6}>
+                <Button variant="contained" color="primary" fullWidth>
+                  Edit
+                </Button>
+              </Grid>
+            </PermissionWrapper>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth
+                onClick={() => {
+                  navigate("/");
+                }}
+              >
+                Go Back
               </Button>
-            )}
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            onClick={() => {
-              navigate("/");
-            }}
-          >
-            Go Back
-          </Button>
-        </Stack>
-        <Stack direction="row" spacing={2} width="48%">
-          {auth.currentUser &&
-            auth.currentUser.uid === eventDetails?.eventOrganizer && (
-              <Button variant="contained" color="error" fullWidth>
-                Delete
-              </Button>
-            )}
-        </Stack>
+            </Grid>
+            <PermissionWrapper
+              roleRequired="admin"
+              ownerId={eventDetails?.eventOrganizer}
+            >
+              <Grid item xs={6}>
+                <Button variant="contained" color="error" fullWidth>
+                  Delete
+                </Button>
+              </Grid>
+            </PermissionWrapper>
+          </Grid>
+        </Box>
       </Stack>
     </Container>
   );
