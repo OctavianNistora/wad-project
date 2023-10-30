@@ -4,7 +4,6 @@ import {
   Container,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -30,8 +29,8 @@ export default function EventAdd() {
   const [eventStartDate, setEventStartDate] = React.useState<Date | null>(null);
   const [eventEndDate, setEventEndDate] = React.useState<Date | null>(null);
 
-  const [allCategories, getAllCategories] = useCategoriesState();
-  const [allLocations, getAllLocations] = useLocationsState();
+  const { allCategories, getAllCategories } = useCategoriesState();
+  const { allLocations, getAllLocations } = useLocationsState();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -54,10 +53,7 @@ export default function EventAdd() {
   }, []);
   return (
     <Container component="main" maxWidth="xs" disableGutters>
-      <Typography variant="h2" align="center" gutterBottom color={"cyan"}>
-        Add Event
-      </Typography>
-      <Stack component={"form"} spacing={2} onSubmit={handleSubmit}>
+      <Stack component="form" spacing={2} onSubmit={handleSubmit}>
         <TextField
           id="eventName"
           label="Event Name"
@@ -132,7 +128,7 @@ export default function EventAdd() {
             variant="contained"
             color="secondary"
             onClick={() => {
-              navigate("/event/list");
+              navigate("/");
             }}
           >
             Cancel
